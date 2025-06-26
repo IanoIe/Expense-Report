@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Purchase Details{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Purchases</h1>
+    <table class="table table-hover" style="border: 1px solid black;">
+    <thead style="border: 1px solid black;" class="table-dark text-center">
+        <tr>
+            <th style="border: 1px solid black;">Store Name</th>
+            <th style="border: 1px solid black;">Product Name</th>
+            <th style="border: 1px solid black;">Date</th>
+            <th style="border: 1px solid black;">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody class="align-middle text-center">
+        <tr>
+            <td style="border: 1px solid black;">{{ purchase.storeName }}</td>
+            <td style="border: 1px solid black;">
+                {% for item in purchase.purchaseItems %}
+                    {{ item.productName }}<br>
+                {% endfor %}
+            </td>
+            <td style="border: 1px solid black;">{{ purchase.date|date('Y-m-d H:i') }}</td>
+            <td style="border: 1px solid black;">
+                <form method="post" action="{{ path('app_purchase_delete', {'id': purchase.id}) }}" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this purchase?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ purchase.id) }}">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+    <a href="{{ path('app_purchase') }}" class="btn btn-secondary">Back to list</a>
+</div>
+{% endblock %}
