@@ -91,7 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!in_array('ROLE_USER', $roles)) {
             $roles[] = 'ROLE_USER';
         }
-        return $roles;
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): static

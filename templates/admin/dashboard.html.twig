@@ -1,2 +1,86 @@
 
 {% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <div class="row justify-content-between">
+            <div class="col-md-7">
+                <h1 style="font-size: 1rem;">Purchase Report</h1>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Store</th>
+                            <th>Product</th>
+                            <th>Date</th>
+                            <th>Total (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in purchaseDetails %}
+                            <tr class="small">
+                                <td>{{ item.store_name }}</td>
+                                <td>{{ item.product_name }}</td>
+                                <td>{{ item.date|date('Y-m-d') }}</td>
+                                <td>€ {{ item.total_price|number_format(2, ',', '.') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4">No purchases found.</td>
+                            </tr>
+                       {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-4">
+                <h2 style="font-size: 1rem;">Add Purchase Item</h2>
+                    <form id="purchase-item-form" method="POST" action="{{ path('app_purchase_item') }}">
+                        <div class="mb-1">
+                            <input type="text" id="product_name" name="product_name" class="form-control form-control-sm" required placeholder="Enter product name">
+                        </div>
+
+                        <div class="mb-1">
+                            <input type="number" step="0.01" id="unit_price" name="unit_price" class="form-control form-control-sm" required placeholder="Unit Price (€)">
+                        </div>
+
+                        <div class="mb-1">
+                            <input type="number" id="quantity" name="quantity" class="form-control form-control-sm" required placeholder="Quantity">
+                        </div>
+
+                        <div class="mb-1">
+                            <label class="form-label" style="font-size: 0.7rem;">Total Price (€)</label>
+                            <input type="text" id="total_price" name="total_price" class="form-control form-control-sm" readonly>
+                        </div>
+
+                        <button type="submit" class="btn btn-sm btn-primary">Add Item</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const unitPriceInput = document.getElementById('unit_price');
+            const quantityInput = document.getElementById('quantity');
+            const totalPriceInput = document.getElementById('total_price');
+
+            function updateTotalPrice() {
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                const quantity = parseInt(quantityInput.value) || 0;
+                const total = unitPrice * quantity;
+                totalPriceInput.value = total.toFixed(2).replace('.', ',');
+            }
+
+            unitPriceInput.addEventListener('input', updateTotalPrice);
+            quantityInput.addEventListener('input', updateTotalPrice);
+
+            // Update load the page if it has values
+            updateTotalPrice();
+        </script>
+    </div>
+
+    <footer class="mt-4 py-2 text-center text-white" style="background-color: #343a40;">
+    <small>&copy; {{ "now"|date("Y") }} Expense Report - All rights reserved</small>
+</footer>
+{% endblock %}
+

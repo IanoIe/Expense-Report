@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -30,18 +31,40 @@ class UserCrudController extends AbstractCrudController
         yield Field::new('plainPassword')
             ->onlyOnForms()
             ->setLabel('Password');
-        yield ArrayField::new('roles');
+
+        yield ChoiceField::new('roles')
+            ->allowMultipleChoices()
+            ->renderExpanded()
+            ->setChoices([
+                'User' => 'ROLE_USER',
+                'Admin' => 'ROLE_ADMIN',
+        ]);
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        /** @var User $entityInstance */
         $this->encodePassword($entityInstance);
+
+        //Ensures at least ROLE_USER
+        if (empty($entityInstance->getRoles()))
+        {
+            $entityInstance->setRoles(['ROLE_USER']);
+        }
+
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        /** @var User $entityInstance */
         $this->encodePassword($entityInstance);
+
+        //Ensures at least ROLE_USER on updates too
+        if (empty($entityInstance->getRoles()))
+        {
+            $entityInstance->setRoles(['ROLE_USER']);
+        }
         parent::updateEntity($entityManager, $entityInstance);
     }
 
